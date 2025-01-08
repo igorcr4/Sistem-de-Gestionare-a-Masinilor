@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -37,13 +38,13 @@ public class CarController {
     }
 
     @GetMapping("/licensePlate")
-    public ResponseEntity<CarDTO> getByLicensePlate(@RequestParam String licensePlate) {
+    public ResponseEntity<CarDTO> findByLicensePlate(@RequestParam String licensePlate) {
         CarDTO getCarWithDriver = service.findByLicensePlate(licensePlate);
         return ResponseEntity.ok(getCarWithDriver);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Car> carById(@PathVariable Long id) {
+    public ResponseEntity<Car> findById(@PathVariable Long id) {
         Car byId = service.findById(id);
         return ResponseEntity.ok(byId);
     }
@@ -54,20 +55,20 @@ public class CarController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/updateKm")
-    public ResponseEntity<String> updateKm(@RequestParam Long carId, @RequestParam Integer newKm) {
+    @PatchMapping("/updateKm/{carId}")
+    public ResponseEntity<String> updateKm(@PathVariable Long carId, @RequestParam Integer newKm) {
         service.updateKm(carId, newKm);
         return ResponseEntity.ok("Kilometrajul masinii a fost actualizat cu succes!");
     }
 
-    @PatchMapping("/setOilChangeKm")
-    public ResponseEntity<String> setOilChangeKm(@RequestParam Long carId, @RequestParam Integer oilChangeKm) {
-        service.setOilChange(carId, oilChangeKm);
-        return ResponseEntity.ok("Uleiul va trebui schimbat la: " + oilChangeKm + " km");
+    @PatchMapping("/setOilChange/{carId}")
+    public ResponseEntity<String> setOilChangeKm(@PathVariable Long carId, @RequestParam Integer oilChange) {
+        service.setOilChange(carId, oilChange);
+        return ResponseEntity.ok("Uleiul va trebui schimbat la: " + oilChange + " km");
     }
 
-    @PatchMapping("/setInsurance")
-    public ResponseEntity<String> setInsurance(@RequestParam Long carId, @RequestParam String date) {
+    @PatchMapping("/setInsurance/{carId}")
+    public ResponseEntity<String> setInsurance(@PathVariable Long carId, @RequestParam LocalDate date) {
         service.setInsurance(carId, date);
         return ResponseEntity.ok("Asigurarea va trebui refacuta la data de: " + date);
     }
@@ -92,6 +93,11 @@ public class CarController {
 
     @ExceptionHandler(CarExceptions.InformationUpdateException.class)
     public ResponseEntity<String> updateInformation(CarExceptions.InformationUpdateException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(CarExceptions.InformationValidityException.class)
+    public ResponseEntity<String> validationCars(CarExceptions.InformationValidityException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

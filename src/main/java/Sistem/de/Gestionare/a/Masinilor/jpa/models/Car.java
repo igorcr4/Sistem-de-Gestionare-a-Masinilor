@@ -1,6 +1,7 @@
 package Sistem.de.Gestionare.a.Masinilor.jpa.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class Car {
     @JsonBackReference
     private Driver driver;
 
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<ServiceHistory> history = new ArrayList<>();
 }

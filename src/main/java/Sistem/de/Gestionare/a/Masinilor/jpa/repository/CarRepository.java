@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -15,9 +16,9 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     boolean existsByLicensePlate(String licensePlate);
 
     @Query("SELECT l FROM Car l WHERE l.licensePlate = :licensePlate")
-    Car findByLicensePlate(@Param("licensePlate") String licensePlate);
+    Optional<Car> findByLicensePlate(@Param("licensePlate") String licensePlate);
 
-    @Query("SELECT c FROM Car c WHERE c.nextInsurance =: twoDaysLater")
+    @Query("SELECT c FROM Car c WHERE c.nextInsurance = :twoDaysLater")
     List<Car> findCarsWithInsuranceExpiring(@Param("twoDaysLater")LocalDate twoDaysLater);
 
 }

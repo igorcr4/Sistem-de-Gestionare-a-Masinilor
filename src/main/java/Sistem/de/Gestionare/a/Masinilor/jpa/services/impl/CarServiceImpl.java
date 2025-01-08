@@ -2,7 +2,6 @@ package Sistem.de.Gestionare.a.Masinilor.jpa.services.impl;
 
 import Sistem.de.Gestionare.a.Masinilor.jpa.dtos.CarDTO;
 import Sistem.de.Gestionare.a.Masinilor.jpa.exceptions.CarExceptions;
-import Sistem.de.Gestionare.a.Masinilor.jpa.exceptions.DriverExceptions;
 import Sistem.de.Gestionare.a.Masinilor.jpa.models.Car;
 import Sistem.de.Gestionare.a.Masinilor.jpa.repository.CarRepository;
 import Sistem.de.Gestionare.a.Masinilor.jpa.services.CarService;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,53 +22,31 @@ public class CarServiceImpl implements CarService {
     String notFoundId = "Masina cu acest id nu exista!";
 
     public Car saveCar(Car car) {
-        List<String> errors = new ArrayList<>();
 
         String name = car.getName();
         String year = car.getYear();
         String licensePlate = car.getLicensePlate();
 
-        if(validation.isCarNameInvalid(name)) {
-            errors.add("Numele " + name + " este invalid!");
-        }
+        validation.validateName(name);
 
-        if(validation.isCarYearInvalid(year)) {
-            errors.add("Anul " + year + " este invalid!");
-        }
+        validation.validateYear(year);
 
-        if(validation.isLicensePlateValidAndExists(licensePlate)) {
-            errors.add("Numarul " + licensePlate + " este invalid sau deja exista!");
-        }
-        if(!errors.isEmpty()) {
-            throw new CarExceptions.CarCreateValidationException(errors);
-        }
+        validation.checkLicensePlateValidityAndExistence(licensePlate);
 
         return repository.save(car);
     }
 
     public Iterable<Car> saveAll(List<Car> cars){
-        List<String> errors = new ArrayList<>();
-
         for(Car car : cars) {
             String name = car.getName();
             String year = car.getYear();
             String licensePlate = car.getLicensePlate();
 
-            if(validation.isCarNameInvalid(name)) {
-                errors.add("Numele " + name + " este invalid!");
-            }
+            validation.validateName(name);
 
-            if(validation.isCarYearInvalid(year)) {
-                errors.add("Anul " + year + " este invalid!");
-            }
+            validation.validateYear(year);
 
-            if(validation.isLicensePlateValidAndExists(licensePlate)) {
-                errors.add("Numarul " + licensePlate + " este invalid sau deja exista!");
-            }
-        }
-
-        if(!errors.isEmpty()) {
-            throw new DriverExceptions.DriverCreateValidationException(errors);
+            validation.checkLicensePlateValidityAndExistence(licensePlate);
         }
 
         return repository.saveAll(cars);
@@ -79,11 +54,12 @@ public class CarServiceImpl implements CarService {
 
 
     public CarDTO findByLicensePlate(String licensePlate) {
-        Car car = repository.findByLicensePlate(licensePlate);
 
-        if(validation.isLicensePlateValidAndExists(licensePlate)) {
-            throw new CarExceptions.FindCarException("Numarul de inmatriculare este invalid sau masina nu exista!");
-        }
+        validation.validateLicensePlate(licensePlate);
+
+        Car car = repository.findByLicensePlate(licensePlate)
+                .orElseThrow(() -> new CarExceptions.FindCarException("Masina cu numarul de inmatriculare: " + licensePlate + " nu exista!"));
+
 
         String firstName = car.getDriver() != null ? car.getDriver().getFirstName() : "";
         String lastName = car.getDriver() != null ? car.getDriver().getLastName() : "";
@@ -100,18 +76,16 @@ public class CarServiceImpl implements CarService {
 
     public Iterable<Car> getAllCars() {
         if(repository.findAll().isEmpty()) {
-            throw new DriverExceptions.FindDriverException("Nu exista nici o masina!");
+            throw new CarExceptions.FindCarException("Nu exista nici o masina!");
         }
         return repository.findAll();
     }
 
     public void deleteByLicensePlate(String licensePlate) {
+        validation.validateLicensePlate(licensePlate);
 
-        if(validation.isLicensePlateValidAndExists(licensePlate)) {
-            throw new CarExceptions.FindCarException("Numarul de inmatriculare este invalid sau nu exista!");
-        }
-
-        Car car = repository.findByLicensePlate(licensePlate);
+        Car car = repository.findByLicensePlate(licensePlate)
+                .orElseThrow(() -> new CarExceptions.FindCarException("Masina cu numarul de inmatriculare: " + licensePlate + " nu exista!"));
 
         repository.delete(car);
     }
@@ -122,6 +96,7 @@ public class CarServiceImpl implements CarService {
 
         Car car = findById(carId);
         car.setCurrentKm(newKm);
+        repository.save(car);
     }
 
     public void setOilChange(Long carId, Integer oilKm) {
@@ -130,17 +105,16 @@ public class CarServiceImpl implements CarService {
 
         Car car = findById(carId);
         car.setNextOilChangeKm(oilKm);
+        repository.save(car);
     }
 
-    public void setInsurance(Long carId, String date) {
+    public void setInsurance(Long carId, LocalDate date) {
         validation.validateId(carId);
-        validation.validateDate(date);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate nextInsurance = LocalDate.parse(date, formatter);
+        validation.validateFutureDate(date);
 
         Car car = findById(carId);
-        car.setNextInsurance(nextInsurance);
+        car.setNextInsurance(date);
+        repository.save(car);
     }
 
 

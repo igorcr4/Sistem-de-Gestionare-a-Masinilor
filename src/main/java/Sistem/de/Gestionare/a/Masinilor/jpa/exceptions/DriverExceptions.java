@@ -4,15 +4,14 @@ import java.util.List;
 
 public class DriverExceptions extends RuntimeException {
 
-    public static class DriverCreateValidationException extends RuntimeException {
-        public DriverCreateValidationException(List<String> errors) {
-            // Fiecare eroare este pe o linie separată
-            super(String.join("\n", errors));
+    public static class ValidationException extends RuntimeException {
+        public ValidationException(String error) {
+            super(error);
         }
     }
 
-    public static class FindDriverException extends RuntimeException {
-        public FindDriverException(String error) {
+    public static class FindException extends RuntimeException {
+        public FindException(String error) {
             super(error);
         }
     }

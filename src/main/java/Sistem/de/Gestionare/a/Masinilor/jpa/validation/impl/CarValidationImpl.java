@@ -20,61 +20,72 @@ public class CarValidationImpl implements CarValidation {
 
 
     public void validateId(Long id) {
-        if(id == null || id < 0 || !id.toString().matches("\\d+")) {
-            throw new CarExceptions.FindCarException("Acest id este invalid!");
+        if(id == null || id <= 0) {
+            throw new CarExceptions.InformationValidityException("Acest id este invalid!");
         }
+
     }
 
     public void validateKm(Integer km) {
-        if(km == null || km < 0 || !km.toString().matches("\\d+")) {
-            throw new CarExceptions.FindCarException("Introdu o valoare valida!");
+        if(km == null || km <= 0) {
+            throw new CarExceptions.FindCarException("Valoarea introdusă pentru kilometraj nu este validă!");
         }
     }
 
-    public void validateDate(String date) {
-        if(date == null || date.isBlank()) {
+    public void validateFutureDate(LocalDate date) {
+        if (date == null) {
             throw new CarExceptions.InformationUpdateException("Data introdusă nu poate fi nulă!");
         }
 
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate parseDate = LocalDate.parse(date, formatter);
-
-            if(parseDate.isBefore(LocalDate.now())) {
-                throw new CarExceptions.InformationUpdateException("Data introdusa trebuie sa fie in prezent sau viitor!");
-            }
-
-        }catch (DateTimeParseException e) {
-            throw new CarExceptions.InformationUpdateException("Data introdusă este invalidă! Formatul corect este dd/MM/yyyy!");
+        if (date.isBefore(LocalDate.now())) {
+            throw new CarExceptions.InformationUpdateException("Data introdusă trebuie să fie în viitor!");
         }
     }
 
-    public void validateCost(String cost) {
-        if (cost == null || cost.trim().isEmpty()) {
-            throw new CarExceptions.InformationUpdateException("Costul nu poate fi gol!");
+    public void validatePastDate(LocalDate date) {
+        if (date == null) {
+            throw new CarExceptions.InformationUpdateException("Data introdusă nu poate fi nula!");
         }
 
-        try {
-            BigDecimal validatedCost = new BigDecimal(cost);
-
-            if (validatedCost.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new CarExceptions.InformationUpdateException("Costul trebuie să fie un număr pozitiv!");
-            }
-        } catch (NumberFormatException e) {
-            throw new CarExceptions.InformationUpdateException("Costul introdus nu este un număr valid!");
+        if (date.isAfter(LocalDate.now())) {
+            throw new CarExceptions.InformationUpdateException("Data introdusa trebuie sa fie in prezent sau în trecut!");
         }
     }
 
 
-    public boolean isCarNameInvalid(String name) {
-        return name == null || !name.matches("^[a-zA-Z\\s-]+$");
+    public void validateCost(BigDecimal cost) {
+        if (cost == null) {
+            throw new CarExceptions.InformationUpdateException("Costul trebuie să fie specificat!");
+        }
+
+        if (cost.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new CarExceptions.InformationUpdateException("Costul trebuie să fie un număr pozitiv!");
+        }
     }
 
-    public boolean isCarYearInvalid(String year) {
-        return year == null || !year.matches("\\d{4}") || (Integer.parseInt(year) < 2000 || Integer.parseInt(year) > LocalDate.now().getYear());
+    public void validateName(String name) {
+        if(name == null || !name.matches("^[a-zA-Z\\s-]+$")) {
+            throw new CarExceptions.InformationValidityException("Nume invalid!");
+        }
     }
 
-    public boolean isLicensePlateValidAndExists(String licensePlate) {
-        return licensePlate == null || !repository.existsByLicensePlate(licensePlate) || !licensePlate.matches(licensePlateRegex);
+    public void validateYear(String year) {
+        if(year == null || !year.matches("\\d{4}") || (Integer.parseInt(year) < 2000 || Integer.parseInt(year) > LocalDate.now().getYear())) {
+            throw new CarExceptions.InformationValidityException("An invalid!");
+        }
     }
+
+    public void validateLicensePlate(String licensePlate) {
+        if(licensePlate == null || !licensePlate.matches(licensePlateRegex)) {
+            throw new CarExceptions.FindCarException("Numar de inmatriculare: " + licensePlate + " este invalid!");
+        }
+    }
+
+    public void checkLicensePlateValidityAndExistence(String licensePlate) {
+        if(licensePlate == null || repository.existsByLicensePlate(licensePlate) || !licensePlate.matches(licensePlateRegex)) {
+            throw new CarExceptions.FindCarException("Numar de inmatriculare: " + licensePlate + " este invalid sau deja exista!");
+        }
+    }
+
+
 }

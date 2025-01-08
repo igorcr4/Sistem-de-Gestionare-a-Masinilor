@@ -1,13 +1,14 @@
 package Sistem.de.Gestionare.a.Masinilor.jpa.validation;
 
 public interface DriverValidation {
-    boolean isFirstNameInvalid(String firstName);
 
-    boolean isLastNameInvalid(String lastName);
+    void validateName(String firstName);
 
-    boolean isCnpInvalid(String cnp);
+    void validateLastName(String lastName);
 
-    boolean isNumberInvalid(String number);
+    void validateCnp(String cnp);
 
-    boolean isEmailInvalid(String email);
+    void validatePhoneNumber(String number);
+
+    void validateEmail(String email);
 }

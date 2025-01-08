@@ -1,5 +1,6 @@
 package Sistem.de.Gestionare.a.Masinilor.jpa.controllers;
 
+import Sistem.de.Gestionare.a.Masinilor.jpa.dtos.ServiceHistoryDTO;
 import Sistem.de.Gestionare.a.Masinilor.jpa.exceptions.CarExceptions;
 import Sistem.de.Gestionare.a.Masinilor.jpa.exceptions.ServiceHistoryExceptions;
 import Sistem.de.Gestionare.a.Masinilor.jpa.models.ServiceHistory;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/service-history")
@@ -27,6 +30,17 @@ public class ServiceHistoryController {
         return ResponseEntity.ok(serviceHistory);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<String> updateServiceInfo(@PathVariable Long id, @RequestBody ServiceHistoryDTO dto) {
+        serviceHistoryInterface.updateInformation(id, dto);
+        return ResponseEntity.ok("Istoricul de service a fost actualizat cu succes!");
+    }
+
+    @GetMapping("/from")
+    public ResponseEntity<Iterable<ServiceHistoryDTO>> historyFrom(@RequestParam LocalDate date, @RequestParam String licensePlate) {
+        Iterable<ServiceHistoryDTO> history = serviceHistoryInterface.findServiceHistorySinceDate(date, licensePlate);
+        return ResponseEntity.ok(history);
+    }
 
 
 

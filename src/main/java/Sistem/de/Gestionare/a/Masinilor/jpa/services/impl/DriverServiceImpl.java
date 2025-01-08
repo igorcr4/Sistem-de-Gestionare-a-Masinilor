@@ -13,68 +13,43 @@ import Sistem.de.Gestionare.a.Masinilor.jpa.validation.DriverValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class DriverServiceImpl implements DriverService {
     @Autowired
-    private DriverRepository repository;
+    private DriverRepository driverRepository;
     @Autowired
     private CarRepository carRepository;
     @Autowired
     private CarValidation validation;
     @Autowired
     private DriverValidation driverValidation;
+    String notFoundId = "Sofer cu acest id nu exista!";
 
-    String emailRegex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-            + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-
-    String nameRegex = "^[A-Z][a-z]+([\\s-][A-Z][a-z]+)*$";
-
-
-    String notFoundId = "Sofer cu acest ID nu exista!";
-
-    String notFoundCarId = "Masina cu acest ID nu exista!";
+    String notFoundCarId = "Masina cu acest id nu exista!";
 
     public Driver saveDriver(Driver driver) {
-        List<String> errors = new ArrayList<>();
-
         String firstName = driver.getFirstName();
         String lastName = driver.getLastName();
         String cnp = driver.getCnp();
         String number = driver.getPhoneNumber();
         String email = driver.getEmail();
 
-        if(driverValidation.isFirstNameInvalid(firstName)) {
-            errors.add("Prenumele: " + firstName + " este invalid!");
-        }
+       driverValidation.validateName(firstName);
 
-        if(driverValidation.isLastNameInvalid(lastName)) {
-            errors.add("Numele: " + lastName + " este invalid!");
-        }
+       driverValidation.validateLastName(lastName);
 
-        if (driverValidation.isCnpInvalid(cnp)) {
-            errors.add("CNP invalid sau deja existent!");
-        }
+       driverValidation.validateCnp(cnp);
 
-        if (driverValidation.isNumberInvalid(number)) {
-            errors.add("Numar de telefon invalid sau deja existent!");
-        }
+       driverValidation.validatePhoneNumber(number);
 
-        if (driverValidation.isEmailInvalid(email)) {
-            errors.add("Email invalid sau deja existent pentru!");
-        }
+        driverValidation.validateEmail(email);
 
-        if(!errors.isEmpty()) {
-            throw new DriverExceptions.DriverCreateValidationException(errors);
-        }
-
-        return repository.save(driver);
+        return driverRepository.save(driver);
     }
 
     public Iterable<Driver> saveAll(List<Driver> drivers){
-        List<String> errors = new ArrayList<>();
 
         for(Driver dr : drivers) {
             String firstName = dr.getFirstName();
@@ -83,47 +58,29 @@ public class DriverServiceImpl implements DriverService {
             String number = dr.getPhoneNumber();
             String email = dr.getEmail();
 
-            if(driverValidation.isFirstNameInvalid(firstName)) {
-                errors.add("Prenumele: " + firstName + " este invalid!");
-            }
+            driverValidation.validateName(firstName);
 
-            if(driverValidation.isLastNameInvalid(lastName)) {
-                errors.add("Numele: " + lastName + " este invalid!");
-            }
+            driverValidation.validateLastName(lastName);
 
-            if (driverValidation.isCnpInvalid(cnp)) {
-                errors.add("CNP invalid sau deja existent!");
-            }
+            driverValidation.validateCnp(cnp);
 
-            if (driverValidation.isNumberInvalid(number)) {
-                errors.add("Numar de telefon invalid sau deja existent!");
-            }
+            driverValidation.validatePhoneNumber(number);
 
-            if (driverValidation.isEmailInvalid(email)) {
-                errors.add("Email invalid sau deja existent pentru!");
-            }
+            driverValidation.validateEmail(email);
         }
 
-        if(!errors.isEmpty()) {
-            throw new DriverExceptions.DriverCreateValidationException(errors);
-        }
-
-       return repository.saveAll(drivers);
+       return driverRepository.saveAll(drivers);
     }
 
     public List<DriverDTO> findByFullName(String firstName, String lastName) {
-        if(driverValidation.isFirstNameInvalid(firstName)) {
-            throw new DriverExceptions.FindDriverException("Prenume invalid!");
-        }
+       driverValidation.validateName(firstName);
 
-        if(driverValidation.isLastNameInvalid(lastName)) {
-            throw new DriverExceptions.FindDriverException("Nume invalid!");
-        }
+       driverValidation.validateLastName(lastName);
 
-        List<Driver> drivers = repository.findByFullName(firstName, lastName);
+        List<Driver> drivers = driverRepository.findByFullName(firstName, lastName);
 
         if(drivers.isEmpty()) {
-           throw new DriverExceptions.FindDriverException("Acest sofer nu exista sau numele este invalid!");
+           throw new DriverExceptions.FindException("Acest sofer nu exista sau numele este invalid!");
         }
 
         return drivers.stream().map(driver -> {
@@ -135,40 +92,42 @@ public class DriverServiceImpl implements DriverService {
     public Driver findById(Long id) {
         validation.validateId(id);
 
-        return repository.findById(id)
-                .orElseThrow(() -> new DriverExceptions.FindDriverException(notFoundId));
+        return driverRepository.findById(id).orElseThrow(() -> new DriverExceptions.FindException(notFoundId));
     }
 
     public Iterable<Driver> getAllDrivers(){
 
-        if(repository.findAll().isEmpty()) {
-            throw new DriverExceptions.FindDriverException("Nu exista nici un sofer!");
+        if(driverRepository.findAll().isEmpty()) {
+            throw new DriverExceptions.FindException("Nu exista nici un sofer!");
         }
-        return repository.findAll();
+        return driverRepository.findAll();
     }
 
     public void deleteDriver(Long id){
         validation.validateId(id);
 
-        repository.findById(id)
-                  .orElseThrow(() -> new DriverExceptions.FindDriverException(notFoundId));
+        driverRepository.findById(id).orElseThrow(() -> new DriverExceptions.FindException(notFoundId));
 
-        repository.deleteById(id);
+        driverRepository.deleteById(id);
     }
 
 
     public Driver mapDriverToCar(Long driverId, Long carId) {
         validation.validateId(driverId);
-
-        Driver driver = repository.findById(driverId)
-                .orElseThrow(() -> new DriverExceptions.FindDriverException(notFoundId));
-
         validation.validateId(carId);
+
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new DriverExceptions.FindException(notFoundId));
 
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new CarExceptions.FindCarException(notFoundCarId));
 
+        if(driverRepository.findByCarId(carId).isPresent()) {
+            throw new CarExceptions.FindCarException("Masina cu id: " + carId + " este deja asociata unui sofer!");
+        }
+
         driver.setCar(car);
+        driverRepository.save(driver);
         return driver;
     }
 

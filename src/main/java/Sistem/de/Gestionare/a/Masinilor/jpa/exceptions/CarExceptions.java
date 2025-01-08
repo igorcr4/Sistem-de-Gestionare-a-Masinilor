@@ -5,8 +5,8 @@ import java.util.List;
 public class CarExceptions extends RuntimeException {
 
     public static class CarCreateValidationException extends RuntimeException {
-        public CarCreateValidationException(List<String> errors) {
-            super(String.join("\n", errors));
+        public CarCreateValidationException(String error) {
+            super(error);
         }
     }
 
@@ -18,6 +18,12 @@ public class CarExceptions extends RuntimeException {
 
     public static class InformationUpdateException extends RuntimeException {
         public InformationUpdateException(String error) {
+            super(error);
+        }
+    }
+
+    public static class InformationValidityException extends RuntimeException {
+        public InformationValidityException(String error) {
             super(error);
         }
     }

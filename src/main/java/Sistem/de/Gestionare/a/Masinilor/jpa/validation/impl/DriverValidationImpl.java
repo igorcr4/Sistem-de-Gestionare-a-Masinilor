@@ -1,5 +1,6 @@
 package Sistem.de.Gestionare.a.Masinilor.jpa.validation.impl;
 
+import Sistem.de.Gestionare.a.Masinilor.jpa.exceptions.DriverExceptions;
 import Sistem.de.Gestionare.a.Masinilor.jpa.repository.DriverRepository;
 import Sistem.de.Gestionare.a.Masinilor.jpa.validation.DriverValidation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +16,37 @@ public class DriverValidationImpl implements DriverValidation {
 
     String nameRegex = "^[A-Z][a-z]+([\\s-][A-Z][a-z]+)*$";
 
-    public boolean isFirstNameInvalid(String firstName) {
-        return firstName == null || !firstName.matches(nameRegex);
+    String cnpRegex = "^[1-8]\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\d{6}$";
+
+
+    public void validateName(String firstName) {
+        if(firstName == null || !firstName.matches(nameRegex)) {
+            throw new DriverExceptions.ValidationException("Prenumele " + firstName + " este invalid!");
+        }
     }
 
-    public boolean isLastNameInvalid(String lastName) {
-        return lastName == null || !lastName.matches(nameRegex);
+    public void validateLastName(String lastName) {
+        if(lastName == null || !lastName.matches(nameRegex)) {
+            throw new DriverExceptions.ValidationException("Numele " + lastName + " este invalid!");
+        }
     }
 
-    public boolean isCnpInvalid(String cnp) {
-        return cnp == null || repository.existsByCnp(cnp) || !cnp.matches(nameRegex);
+    public void validateCnp(String cnp) {
+        if(cnp == null || repository.existsByCnp(cnp) || !cnp.matches(cnpRegex)) {
+            throw new DriverExceptions.ValidationException("CNP: " + cnp + " este invalid sau deja exista!");
+        }
     }
 
-    public boolean isNumberInvalid(String number) {
-        return number == null || repository.existsByPhoneNumber(number) || !number.matches("\\d{10}");
+    public void validatePhoneNumber(String number) {
+        if(number == null || repository.existsByPhoneNumber(number) || !number.matches("\\d{10}")) {
+            throw new DriverExceptions.ValidationException("Numarul: " + number + " este invalid sau deja exista!");
+        }
     }
 
-    public boolean isEmailInvalid(String email) {
-        return email == null || repository.existsByEmail(email) || !email.matches(emailRegex);
+    public void validateEmail(String email) {
+        if(email == null || repository.existsByEmail(email) || !email.matches(emailRegex)) {
+            throw new DriverExceptions.ValidationException("Email: " + email + " este invalid sau deja exista!");
+        }
     }
 
 

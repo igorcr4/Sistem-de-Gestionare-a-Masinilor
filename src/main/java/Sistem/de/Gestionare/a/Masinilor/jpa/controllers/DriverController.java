@@ -37,7 +37,7 @@ public class DriverController {
         return ResponseEntity.ok(getAll);
     }
 
-    @GetMapping("/fullName")
+    @GetMapping
     public ResponseEntity<List<DriverDTO>> getByFullName(@RequestParam String firstName, @RequestParam String lastName) {
         List<DriverDTO> getDriverWithCar = service.findByFullName(firstName, lastName);
         return ResponseEntity.ok(getDriverWithCar);
@@ -55,8 +55,8 @@ public class DriverController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/map")
-    public ResponseEntity<Driver> map(@RequestParam Long driverId, @RequestParam Long carId) {
+    @PostMapping("/{driverId}/{carId}")
+    public ResponseEntity<Driver> map(@PathVariable Long driverId, @PathVariable Long carId) {
         Driver driver = service.mapDriverToCar(driverId, carId);
         return ResponseEntity.ok(driver);
     }
@@ -68,14 +68,14 @@ public class DriverController {
 
 
     //prinde toate exceptiile care pot aparea la crearea unui sau mai multi soferi
-    @ExceptionHandler(DriverExceptions.DriverCreateValidationException.class)
-    public ResponseEntity<String> validationDriversException(DriverExceptions.DriverCreateValidationException e) {
+    @ExceptionHandler(DriverExceptions.ValidationException.class)
+    public ResponseEntity<String> validationDriversException(DriverExceptions.ValidationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     //prinde toate exceptiile care pot aparea la cautarea unui sau mai multi soferi
-    @ExceptionHandler(DriverExceptions.FindDriverException.class)
-    public ResponseEntity<String> findDriversException(DriverExceptions.FindDriverException e) {
+    @ExceptionHandler(DriverExceptions.FindException.class)
+    public ResponseEntity<String> findDriversException(DriverExceptions.FindException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 

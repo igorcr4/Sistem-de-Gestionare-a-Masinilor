@@ -23,6 +23,6 @@ public interface CarService {
 
     void setOilChange(Long carId, Integer oilKm);
 
-    void setInsurance(Long carId, String date);
+    void setInsurance(Long carId, LocalDate date);
 
 }

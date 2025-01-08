@@ -16,6 +16,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long>{
     boolean existsByCnp(String cnp);
     boolean existsByPhoneNumber(String phoneNumber);
     boolean existsByEmail(String email);
+    Optional<Driver> findByCarId(Long carId);
 
 
     @Query("SELECT d FROM Driver d WHERE d.firstName = :firstName AND d.lastName = :lastName")

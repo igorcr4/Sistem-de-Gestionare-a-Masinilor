@@ -1,17 +1,24 @@
 package Sistem.de.Gestionare.a.Masinilor.jpa.validation;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 public interface CarValidation {
     void validateId(Long id);
 
     void validateKm(Integer km);
 
-    void validateDate(String date);
+    void validateFutureDate(LocalDate date);
 
-    void validateCost(String cost);
+    void validatePastDate(LocalDate date);
 
-    boolean isCarNameInvalid(String name);
+    void validateCost(BigDecimal cost);
 
-    boolean isCarYearInvalid(String year);
+    void validateName(String name);
 
-    boolean isLicensePlateValidAndExists(String licensePlate);
+    void validateYear(String year);
+
+    void validateLicensePlate(String licensePlate);
+
+    void checkLicensePlateValidityAndExistence(String licensePlate);
 }
