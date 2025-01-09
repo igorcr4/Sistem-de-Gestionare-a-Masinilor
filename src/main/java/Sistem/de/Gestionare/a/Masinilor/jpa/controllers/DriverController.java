@@ -43,19 +43,19 @@ public class DriverController {
         return ResponseEntity.ok(getDriverWithCar);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Driver> driverById(@PathVariable Long id) {
         Driver byId = service.findById(id);
         return ResponseEntity.ok(byId);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> deleteDriver(@PathVariable Long id){
         service.deleteDriver(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{driverId}/{carId}")
+    @PostMapping("/map/{driverId}/{carId}")
     public ResponseEntity<Driver> map(@PathVariable Long driverId, @PathVariable Long carId) {
         Driver driver = service.mapDriverToCar(driverId, carId);
         return ResponseEntity.ok(driver);

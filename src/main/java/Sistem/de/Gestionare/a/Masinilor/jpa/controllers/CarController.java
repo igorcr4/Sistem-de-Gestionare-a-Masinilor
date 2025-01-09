@@ -43,7 +43,7 @@ public class CarController {
         return ResponseEntity.ok(getCarWithDriver);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Car> findById(@PathVariable Long id) {
         Car byId = service.findById(id);
         return ResponseEntity.ok(byId);
