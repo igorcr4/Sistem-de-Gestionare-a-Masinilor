@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 @Component
 public class CarValidationImpl implements CarValidation {
@@ -21,24 +19,24 @@ public class CarValidationImpl implements CarValidation {
 
     public void validateId(Long id) {
         if(id == null || id <= 0) {
-            throw new CarExceptions.InformationValidityException("Acest id este invalid!");
+            throw new CarExceptions.InformationValidityException("Id: " + id + " este invalid!");
         }
 
     }
 
     public void validateKm(Integer km) {
         if(km == null || km <= 0) {
-            throw new CarExceptions.FindCarException("Valoarea introdusă pentru kilometraj nu este validă!");
+            throw new CarExceptions.FindCarException("Valoarea introdusa pentru kilometraj nu este valida!");
         }
     }
 
     public void validateFutureDate(LocalDate date) {
         if (date == null) {
-            throw new CarExceptions.InformationUpdateException("Data introdusă nu poate fi nulă!");
+            throw new CarExceptions.InformationUpdateException("Data introdusa nu poate fi nula!");
         }
 
         if (date.isBefore(LocalDate.now())) {
-            throw new CarExceptions.InformationUpdateException("Data introdusă trebuie să fie în viitor!");
+            throw new CarExceptions.InformationUpdateException("Data " + date + " trebuie sa fie in viitor!");
         }
     }
 
@@ -48,7 +46,7 @@ public class CarValidationImpl implements CarValidation {
         }
 
         if (date.isAfter(LocalDate.now())) {
-            throw new CarExceptions.InformationUpdateException("Data introdusa trebuie sa fie in prezent sau în trecut!");
+            throw new CarExceptions.InformationUpdateException("Data " + date + " trebuie sa fie in prezent sau în trecut!");
         }
     }
 
@@ -65,13 +63,13 @@ public class CarValidationImpl implements CarValidation {
 
     public void validateName(String name) {
         if(name == null || !name.matches("^[a-zA-Z\\s-]+$")) {
-            throw new CarExceptions.InformationValidityException("Nume invalid!");
+            throw new CarExceptions.InformationValidityException("Numele " + name + " este invalid!");
         }
     }
 
     public void validateYear(String year) {
         if(year == null || !year.matches("\\d{4}") || (Integer.parseInt(year) < 2000 || Integer.parseInt(year) > LocalDate.now().getYear())) {
-            throw new CarExceptions.InformationValidityException("An invalid!");
+            throw new CarExceptions.InformationValidityException("Anul " + year + " este invalid!");
         }
     }
 

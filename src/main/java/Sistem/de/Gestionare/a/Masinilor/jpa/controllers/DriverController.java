@@ -38,7 +38,7 @@ public class DriverController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DriverDTO>> getByFullName(@RequestParam String firstName, @RequestParam String lastName) {
+    public ResponseEntity<List<DriverDTO>> findByFullName(@RequestParam String firstName, @RequestParam String lastName) {
         List<DriverDTO> getDriverWithCar = service.findByFullName(firstName, lastName);
         return ResponseEntity.ok(getDriverWithCar);
     }
@@ -85,6 +85,11 @@ public class DriverController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
+    //prinde exceptia la crearea masinii cu soferul
+    @ExceptionHandler(CarExceptions.InformationValidityException.class)
+    public ResponseEntity<String> informationValidity(CarExceptions.InformationValidityException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 
 
 }

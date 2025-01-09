@@ -37,6 +37,16 @@ public class DriverValidationImpl implements DriverValidation {
         }
     }
 
+    public void validateAge(Integer age) {
+        if(age == null) {
+            throw new DriverExceptions.ValidationException("Introduceti o varsta!");
+        }
+
+        if(age < 18) {
+            throw new DriverExceptions.ValidationException("Soferul trebuie să aiba cel putin 18 ani!");
+        }
+    }
+
     public void validatePhoneNumber(String number) {
         if(number == null || repository.existsByPhoneNumber(number) || !number.matches("\\d{10}")) {
             throw new DriverExceptions.ValidationException("Numarul: " + number + " este invalid sau deja exista!");

@@ -22,7 +22,7 @@ public class DriverServiceImpl implements DriverService {
     @Autowired
     private CarRepository carRepository;
     @Autowired
-    private CarValidation validation;
+    private CarValidation carValidation;
     @Autowired
     private DriverValidation driverValidation;
     String notFoundId = "Sofer cu acest id nu exista!";
@@ -35,6 +35,8 @@ public class DriverServiceImpl implements DriverService {
         String cnp = driver.getCnp();
         String number = driver.getPhoneNumber();
         String email = driver.getEmail();
+        Integer age = driver.getAge();
+        Car car = driver.getCar();
 
        driverValidation.validateName(firstName);
 
@@ -44,9 +46,17 @@ public class DriverServiceImpl implements DriverService {
 
        driverValidation.validatePhoneNumber(number);
 
-        driverValidation.validateEmail(email);
+       driverValidation.validateEmail(email);
 
-        return driverRepository.save(driver);
+       driverValidation.validateAge(age);
+
+       if(car != null) {
+           carValidation.validateName(car.getName());
+           carValidation.validateYear(car.getYear());
+           carValidation.checkLicensePlateValidityAndExistence(car.getLicensePlate());
+       }
+
+       return driverRepository.save(driver);
     }
 
     public Iterable<Driver> saveAll(List<Driver> drivers){
@@ -57,6 +67,8 @@ public class DriverServiceImpl implements DriverService {
             String cnp = dr.getCnp();
             String number = dr.getPhoneNumber();
             String email = dr.getEmail();
+            Integer age = dr.getAge();
+            Car car = dr.getCar();
 
             driverValidation.validateName(firstName);
 
@@ -67,6 +79,14 @@ public class DriverServiceImpl implements DriverService {
             driverValidation.validatePhoneNumber(number);
 
             driverValidation.validateEmail(email);
+
+            driverValidation.validateAge(age);
+
+            if(dr.getCar() != null) {
+                carValidation.validateName(car.getName());
+                carValidation.validateYear(car.getYear());
+                carValidation.checkLicensePlateValidityAndExistence(car.getLicensePlate());
+            }
         }
 
        return driverRepository.saveAll(drivers);
@@ -80,7 +100,7 @@ public class DriverServiceImpl implements DriverService {
         List<Driver> drivers = driverRepository.findByFullName(firstName, lastName);
 
         if(drivers.isEmpty()) {
-           throw new DriverExceptions.FindException("Acest sofer nu exista sau numele este invalid!");
+           throw new DriverExceptions.FindException("Acest sofer nu exista!");
         }
 
         return drivers.stream().map(driver -> {
@@ -90,7 +110,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     public Driver findById(Long id) {
-        validation.validateId(id);
+        carValidation.validateId(id);
 
         return driverRepository.findById(id).orElseThrow(() -> new DriverExceptions.FindException(notFoundId));
     }
@@ -104,7 +124,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     public void deleteDriver(Long id){
-        validation.validateId(id);
+        carValidation.validateId(id);
 
         driverRepository.findById(id).orElseThrow(() -> new DriverExceptions.FindException(notFoundId));
 
@@ -113,8 +133,8 @@ public class DriverServiceImpl implements DriverService {
 
 
     public Driver mapDriverToCar(Long driverId, Long carId) {
-        validation.validateId(driverId);
-        validation.validateId(carId);
+        carValidation.validateId(driverId);
+        carValidation.validateId(carId);
 
         Driver driver = driverRepository.findById(driverId)
                 .orElseThrow(() -> new DriverExceptions.FindException(notFoundId));

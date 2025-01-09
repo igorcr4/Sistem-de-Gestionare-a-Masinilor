@@ -11,4 +11,6 @@ public interface DriverValidation {
     void validatePhoneNumber(String number);
 
     void validateEmail(String email);
+
+    void validateAge(Integer age);
 }

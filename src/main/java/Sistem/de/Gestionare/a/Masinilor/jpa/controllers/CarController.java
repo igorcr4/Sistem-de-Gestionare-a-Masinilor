@@ -82,7 +82,7 @@ public class CarController {
 
 
     @ExceptionHandler(CarExceptions.CarCreateValidationException.class)
-    public ResponseEntity<String> validationCars(CarExceptions.CarCreateValidationException e) {
+    public ResponseEntity<String> informationValidity(CarExceptions.CarCreateValidationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -97,7 +97,7 @@ public class CarController {
     }
 
     @ExceptionHandler(CarExceptions.InformationValidityException.class)
-    public ResponseEntity<String> validationCars(CarExceptions.InformationValidityException e) {
+    public ResponseEntity<String> informationValidity(CarExceptions.InformationValidityException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

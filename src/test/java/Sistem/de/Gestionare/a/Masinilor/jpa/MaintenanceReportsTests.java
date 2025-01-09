@@ -1,9 +1,10 @@
 package Sistem.de.Gestionare.a.Masinilor.jpa;
 
 import Sistem.de.Gestionare.a.Masinilor.jpa.models.Car;
+import Sistem.de.Gestionare.a.Masinilor.jpa.repository.CarRepository;
 import Sistem.de.Gestionare.a.Masinilor.jpa.services.CarService;
 import Sistem.de.Gestionare.a.Masinilor.jpa.services.EmailService;
-import Sistem.de.Gestionare.a.Masinilor.jpa.services.MaintenanceReport;
+import Sistem.de.Gestionare.a.Masinilor.jpa.services.impl.MaintenanceReportImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,11 +20,13 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MaintenanceReportsTests {
     @InjectMocks
-    MaintenanceReport maintenanceReport;
+    MaintenanceReportImpl maintenanceReport;
     @Mock
     CarService carService;
     @Mock
     EmailService emailService;
+    @Mock
+    CarRepository carRepository;
 
     @Test
     public void checkOilChangeTest() {
